@@ -1,0 +1,15 @@
+{
+  "name": "shop-graphql-federation",
+  "version": "1.0.0",
+  "scripts": {
+    "start:users": "cd users && npm run start:dev",
+    "start:products": "cd products && npm run start:dev",
+    "start:orders": "cd orders && npm run start:dev",
+    "start:gateway": "cd gateway && npm run start:dev",
+    "start:all": "npx concurrently \"npm run start:users\" \"npm run start:products\" \"npm run start:orders\" \"wait-on tcp:4001 tcp:4002 tcp:4003 && npm run start:gateway\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
+  }
+}
