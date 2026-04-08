@@ -7,7 +7,7 @@ A distributed GraphQL architecture using **Apollo Federation v2** and **NestJS**
 ```mermaid
 graph TD
     Client["Client (GraphQL Playground)"] --> Gateway["Apollo Gateway (Port 4000)"]
-    
+
     subgraph "Subgraphs"
         Gateway --> Users["Users Service (Port 4001)"]
         Gateway --> Products["Products Service (Port 4002)"]
@@ -20,12 +20,12 @@ graph TD
 
 ### Services Detail
 
-| Service | Port | Description | Managed Entities |
-| :--- | :--- | :--- | :--- |
-| **Gateway** | 4000 | The entry point that composes all subgraphs. | N/A |
-| **Users** | 4001 | Handles user profiles and authentication data. | `User` |
-| **Products** | 4002 | Manages the product catalog. | `Product` |
-| **Orders** | 4003 | Handles transactions and links users to products. | `Order`, `User` (extended), `Product` (referenced) |
+| Service      | Port | Description                                       | Managed Entities                                   |
+| :----------- | :--- | :------------------------------------------------ | :------------------------------------------------- |
+| **Gateway**  | 4000 | The entry point that composes all subgraphs.      | N/A                                                |
+| **Users**    | 4001 | Handles user profiles and authentication data.    | `User`                                             |
+| **Products** | 4002 | Manages the product catalog.                      | `Product`                                          |
+| **Orders**   | 4003 | Handles transactions and links users to products. | `Order`, `User` (extended), `Product` (referenced) |
 
 ---
 
@@ -57,6 +57,7 @@ npm run start:all
 ```
 
 This will:
+
 1. Start **Users**, **Products**, and **Orders** services.
 2. Wait for them to be healthy (Port 4001, 4002, 4003).
 3. Start the **Gateway** (Port 4000).
@@ -68,6 +69,7 @@ This will:
 Access the GraphQL Playground at: [http://localhost:4000/graphql](http://localhost:4000/graphql)
 
 ### 1. Fetch Orders with Full Details
+
 This query demonstrates cross-service resolution. The `user` and `products` fields are resolved by stitching data from different services.
 
 ```graphql
@@ -87,6 +89,7 @@ query GetOrdersWithDetails {
 ```
 
 ### 2. Fetch a User with Their Orders
+
 This demonstrates the `@extends` capability, where the Orders service adds a field to the `User` type owned by the Users service.
 
 ```graphql
@@ -109,8 +112,24 @@ query GetUserOrders {
 
 - **Framework**: [NestJS](https://nestjs.com/)
 - **GraphQL**: [Apollo Federation v2](https://www.apollographql.com/docs/federation/)
+- **Persistence**: [Prisma](https://www.prisma.io/) with [SQLite](https://www.sqlite.org/)
 - **Language**: TypeScript
 - **Server**: Express 5 (via `@as-integrations/express5`)
+
+## 💾 Persistence Layer
+
+Each service maintains its own SQLite database (`dev.db` in each service folder) managed by Prisma.
+
+- **Users**: Stores `User` records.
+- **Products**: Stores `Product` records.
+- **Orders**: Stores `Order` and `OrderItem` (linking product IDs).
+
+To explore the database for any service:
+
+```bash
+cd <service-name>
+npx prisma studio
+```
 
 ## 💡 Troubleshooting
 

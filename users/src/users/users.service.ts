@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [
-    { id: '1', username: 'john_doe', email: 'john@example.com' },
-    { id: '2', username: 'jane_doe', email: 'jane@example.com' },
-  ];
+  constructor(private prisma: PrismaService) {}
 
   findAll() {
-    return this.users;
+    return this.prisma.user.findMany();
   }
 
   findOne(id: string) {
-    return this.users.find(user => user.id === id);
+    return this.prisma.user.findUnique({ where: { id } });
   }
 }

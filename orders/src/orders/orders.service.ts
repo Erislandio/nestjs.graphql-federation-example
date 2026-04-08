@@ -1,18 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { Order } from './entities/order.entity';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class OrdersService {
-  private orders: Order[] = [
-    { id: '101', userId: '1', productIds: ['1', '2'] },
-    { id: '102', userId: '2', productIds: ['3'] },
-  ];
+  constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.orders;
+  async findAll() {
+    const orders = await this.prisma.order.findMany({
+      include: { items: true },
+    });
+    return orders.map(o => ({
+      ...o,
+      productIds: o.items.map(item => item.productId),
+    }));
   }
 
-  findByUser(userId: string) {
-    return this.orders.filter(order => order.userId === userId);
+  async findByUser(userId: string) {
+    const orders = await this.prisma.order.findMany({
+      where: { userId },
+      include: { items: true },
+    });
+    return orders.map(o => ({
+      ...o,
+      productIds: o.items.map(item => item.productId),
+    }));
   }
 }
