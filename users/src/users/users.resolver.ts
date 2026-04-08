@@ -7,10 +7,14 @@ import {
 } from "@nestjs/graphql";
 import { User, UserInput } from "./entities/user.entity";
 import { UsersService } from "./users.service";
+import { UsersLoader } from "./users.loader";
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly usersLoader: UsersLoader,
+  ) {}
 
   @Query(() => [User], { name: "users" })
   findAll() {
@@ -29,6 +33,6 @@ export class UsersResolver {
 
   @ResolveReference()
   resolveReference(reference: { __typename: string; id: string }) {
-    return this.usersService.findOne(reference.id);
+    return this.usersLoader.batchUsers.load(reference.id);
   }
 }

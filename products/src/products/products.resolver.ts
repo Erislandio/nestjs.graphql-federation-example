@@ -1,10 +1,14 @@
 import { Resolver, Query, Args, ResolveReference } from '@nestjs/graphql';
 import { ProductsService } from './products.service';
 import { Product } from './entities/product.entity';
+import { ProductsLoader } from './products.loader';
 
 @Resolver(() => Product)
 export class ProductsResolver {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly productsLoader: ProductsLoader,
+  ) {}
 
   @Query(() => [Product], { name: 'products' })
   findAll() {
@@ -18,6 +22,6 @@ export class ProductsResolver {
 
   @ResolveReference()
   resolveReference(reference: { __typename: string; id: string }) {
-    return this.productsService.findOne(reference.id);
+    return this.productsLoader.batchProducts.load(reference.id);
   }
 }

@@ -22,4 +22,12 @@ export class UsersService {
       },
     });
   }
+
+  findByIds(ids: readonly string[]) {
+    return this.prisma.user.findMany({
+      where: {
+        id: { in: ids as string[] },
+      },
+    });
+  }
 }

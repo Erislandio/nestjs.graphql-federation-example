@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  users:
+    build: ./users
+    ports:
+      - "4001:4001"
+    volumes:
+      - ./users/prisma:/app/prisma
+    environment:
+      - DATABASE_URL=file:./dev.db
+
+  products:
+    build: ./products
+    ports:
+      - "4002:4002"
+    volumes:
+      - ./products/prisma:/app/prisma
+    environment:
+      - DATABASE_URL=file:./dev.db
+
+  orders:
+    build: ./orders
+    ports:
+      - "4003:4003"
+    volumes:
+      - ./orders/prisma:/app/prisma
+    environment:
+      - DATABASE_URL=file:./dev.db
+
+  auth:
+    build: ./auth
+    ports:
+      - "4004:4004"
+    volumes:
+      - ./auth/prisma:/app/prisma
+    environment:
+      - DATABASE_URL=file:./dev.db
+      - JWT_SECRET=test_secret
+
+  gateway:
+    build: ./gateway
+    ports:
+      - "4000:4000"
+    depends_on:
+      - users
+      - products
+      - orders
+      - auth
+    environment:
+      - USERS_SERVICE_URL=http://users:4001/graphql
+      - PRODUCTS_SERVICE_URL=http://products:4002/graphql
+      - ORDERS_SERVICE_URL=http://orders:4003/graphql
+      - AUTH_SERVICE_URL=http://auth:4004/graphql

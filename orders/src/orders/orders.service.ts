@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Order } from './entities/order.entity';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class OrdersService {
@@ -10,9 +9,9 @@ export class OrdersService {
     const orders = await this.prisma.order.findMany({
       include: { items: true },
     });
-    return orders.map(o => ({
+    return orders.map((o) => ({
       ...o,
-      productIds: o.items.map(item => item.productId),
+      productIds: o.items.map((item) => item.productId),
     }));
   }
 
@@ -21,9 +20,20 @@ export class OrdersService {
       where: { userId },
       include: { items: true },
     });
-    return orders.map(o => ({
+    return orders.map((o) => ({
       ...o,
-      productIds: o.items.map(item => item.productId),
+      productIds: o.items.map((item) => item.productId),
+    }));
+  }
+
+  async findByUserIds(userIds: readonly string[]) {
+    const orders = await this.prisma.order.findMany({
+      where: { userId: { in: userIds as string[] } },
+      include: { items: true },
+    });
+    return orders.map((o) => ({
+      ...o,
+      productIds: o.items.map((item) => item.productId),
     }));
   }
 }
