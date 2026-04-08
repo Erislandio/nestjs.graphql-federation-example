@@ -12,10 +12,12 @@ graph TD
         Gateway --> Users["Users Service (Port 4001)"]
         Gateway --> Products["Products Service (Port 4002)"]
         Gateway --> Orders["Orders Service (Port 4003)"]
+        Gateway --> Auth["Auth Service (Port 4004)"]
     end
 
     Orders -.->|Extends| Users
     Orders -.->|References| Products
+    Auth -.->|Provides| AuthPayload
 ```
 
 ### Services Detail
@@ -23,9 +25,10 @@ graph TD
 | Service      | Port | Description                                       | Managed Entities                                   |
 | :----------- | :--- | :------------------------------------------------ | :------------------------------------------------- |
 | **Gateway**  | 4000 | The entry point that composes all subgraphs.      | N/A                                                |
-| **Users**    | 4001 | Handles user profiles and authentication data.    | `User`                                             |
+| **Users**    | 4001 | Handles user profiles and data.                   | `User`                                             |
 | **Products** | 4002 | Manages the product catalog.                      | `Product`                                          |
 | **Orders**   | 4003 | Handles transactions and links users to products. | `Order`, `User` (extended), `Product` (referenced) |
+| **Auth**     | 4004 | Handles JWT authentication and credentials.       | `AuthPayload`, `AuthCredential`                    |
 
 ---
 
@@ -58,8 +61,8 @@ npm run start:all
 
 This will:
 
-1. Start **Users**, **Products**, and **Orders** services.
-2. Wait for them to be healthy (Port 4001, 4002, 4003).
+1. Start **Users**, **Products**, **Orders**, and **Auth** services.
+2. Wait for them to be healthy (Port 4001, 4002, 4003, 4004).
 3. Start the **Gateway** (Port 4000).
 
 ---
@@ -136,3 +139,15 @@ npx prisma studio
 If you encounter a `No driver (HTTP) has been selected` error, ensure `@nestjs/platform-express` is installed in the service directory.
 
 If you encounter an error related to `@as-integrations/express5`, it's because this project uses **Express 5**. Ensure both `@apollo/server` and `@as-integrations/express5` are installed in every service.
+
+---
+
+## 📝 Change Log
+
+### [2026-04-08] - Added Auth Service
+
+- **New Service**: Initialized `auth` service using NestJS and Apollo Federation.
+- **Authentication**: Implemented JWT-based login and signup mutations.
+- **Persistence**: Integrated Prisma with SQLite for the auth service (`AuthCredential` model).
+- **Gateway**: Added `auth` service subgraph to the Apollo Gateway.
+- **Scripts**: Updated root `package.json` to include `start:auth` and updated `start:all`.
