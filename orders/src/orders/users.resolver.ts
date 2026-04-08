@@ -8,7 +8,7 @@ export class UsersResolver {
   constructor(private readonly ordersService: OrdersService) {}
 
   @ResolveField(() => [Order])
-  orders(@Parent() user: User): Order[] {
+  orders(@Parent() user: User): Promise<Order[]> {
     return this.ordersService.findByUser(user.id);
   }
 }
